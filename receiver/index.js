@@ -15,7 +15,7 @@ const server = http.createServer(function (req, res) {
       const output = brotliDecompressSync(msg).toString()
       console.log(output) // STDOUT
     })
-    .on('error', err => console.log(`An error has occured: ${err}`))
+    .on('error', err => console.error(`An error has occured: ${err}`))
 
 })
 
