@@ -1,13 +1,22 @@
 'use strict'
 
-const request = require('request')
+const axios = require('axios')
+const { brotliCompress } = require("zlib");
 
-/*
-*  This function will be called for each event.  (eg: for each sensor reading)
-*  Modify it as needed.
-*/
-module.exports = function(eventMsg, encoding, callback) {
-  request.post('http://localhost:8080/event', {json: true, body: eventMsg}, (err, res, body) => {
-    callback(err)
+module.exports = function (event, _, callback, { post } = axios) {
+  // Compressing data using google's brotli
+  brotliCompress(event, function (err, data) {
+    if (err) {
+      console.log("An error occured in data compression")
+      callback(err)
+      return
+    }
+
+    post('http://localhost:8081/event', data)
+      .then(_ => callback())
+      .catch(err => {
+        console.log(`ERROR: ${err.message}`)
+        callback(err)
+      })
   })
 }
